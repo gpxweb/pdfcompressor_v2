@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusText = document.getElementById('status-text');
     const resultsContainer = document.getElementById('results-container');
     const uploadContainer = document.getElementById('upload-container');
-    const compressBtn = document.getElementById('compress-btn');
     const downloadBtn = document.getElementById('download-btn');
     const newFileBtn = document.getElementById('new-file-btn');
     const fileNameSpan = document.getElementById('file-name');
@@ -120,39 +119,26 @@ document.addEventListener('DOMContentLoaded', function() {
             originalSizeSpan.textContent = originalSize.toFixed(2);
             
             // Update progress
-            statusText.textContent = 'File loaded. Ready to compress!';
+            statusText.textContent = 'Starting compression...';
             progressBar.style.width = '50%';
             progressBar.setAttribute('aria-valuenow', 50);
             
-            // Show compress button
-            compressBtn.classList.remove('d-none');
+            // Start compression immediately
+            startCompression();
         } catch (error) {
             showError('Error loading PDF: ' + error.message);
             resetUploadForm();
         }
     }
-
-    // Read file as ArrayBuffer
-    function readFileAsArrayBuffer(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsArrayBuffer(file);
-        });
-    }
-
-    // Compress the loaded PDF
-    compressBtn.addEventListener('click', async function() {
+    
+    // Function to start compression process
+    async function startCompression() {
         if (!originalPdfBytes) return;
         
         // Update status
         statusText.textContent = 'Compressing...';
         progressBar.style.width = '75%';
         progressBar.setAttribute('aria-valuenow', 75);
-        
-        // Hide compress button
-        compressBtn.classList.add('d-none');
         
         try {
             // Compress the PDF
@@ -186,7 +172,20 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('Compression failed: ' + error.message);
             resetUploadForm();
         }
-    });
+    }
+
+    // Read file as ArrayBuffer
+    function readFileAsArrayBuffer(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    // We've removed the compress button and its event listener
+    // Compression now starts automatically after file upload
 
     // Client-side PDF compression
     async function compressPdf(pdfBytes) {
@@ -323,7 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
         resultsContainer.classList.add('d-none');
         uploadContainer.classList.remove('d-none');
         
-        compressBtn.classList.add('d-none');
         downloadBtn.classList.add('d-none');
         newFileBtn.classList.add('d-none');
         
